@@ -23,6 +23,7 @@ export class NX595EPlatform implements DynamicPlatformPlugin {
   private radarPersistence: number = 60000;
   private smokePersistence: number = 60000;
   private displayBypassSwitches: Boolean = false;
+  private displayChimeSwitches: Boolean = false;
   private displayOutputSwitches: Boolean = false;
   private useHTTPS: Boolean = false;
   private loggedIn: Boolean = false;
@@ -37,6 +38,7 @@ export class NX595EPlatform implements DynamicPlatformPlugin {
     const ip = <string>this.config.ip;
     this.pollTimer = <number>this.config.pollTimer;
     this.displayBypassSwitches = (this.config.displayBypassSwitches)? <Boolean>this.config.displayBypassSwitches: false;
+    this.displayChimeSwitches = (this.config.displayChimeSwitches)? <Boolean>this.config.displayChimeSwitches: false;
     this.displayOutputSwitches = (this.config.displayOutputSwitches)? <Boolean>this.config.displayOutputSwitches: false;
     this.radarPersistence = (this.config.radarPersistence)? <number>this.config.radarPersistence: 60000;
     this.smokePersistence = (this.config.smokePersistence)? <number>this.config.smokePersistence: 60000;
@@ -406,7 +408,7 @@ export class NX595EPlatform implements DynamicPlatformPlugin {
             this.log.debug(device.bank_state);
             switch (device.type) {
               case DeviceType.area: {
-                new NX595EPlatformSecurityAreaAccessory(this, existingAccessory, this.securitySystem);
+                new NX595EPlatformSecurityAreaAccessory(this, existingAccessory, this.securitySystem, this.displayChimeSwitches);
                 break;
               }
               case DeviceType.output: {
@@ -463,7 +465,7 @@ export class NX595EPlatform implements DynamicPlatformPlugin {
         if (device.type == DeviceType.area || device.shouldIgnore == false) {
           switch (device.type) {
             case DeviceType.area: {
-              new NX595EPlatformSecurityAreaAccessory(this, accessory, this.securitySystem);
+              new NX595EPlatformSecurityAreaAccessory(this, accessory, this.securitySystem, this.displayChimeSwitches);
               break;
             }
             case DeviceType.output: {

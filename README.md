@@ -50,11 +50,11 @@ You need to set the following attributes:
 
 * `pollTimer` - this plugin works by asking the NX-595E for changes at given time intervals, a technique otherwise known as "polling". This attribute determines the amount of time in milliseconds between polling attemps, and can range between 100 ms and 5000 ms (five seconds). Too small values might congest your alarm's network interface and force it to ignore incoming requests, too large ones will result in slow status updates. Based on trial and error, anywhere between 250 and 2500 is good.
 
-* `displayBypassSwitches` - this option is optional and allows you to override the plugin's standard behavior and hide the bypass switches for zones. If not set, this defaults to true (see Usage below).
-
 * `radarPersistence` and `smokePersistence` - these two settings are optional, and they allow to modify the time in milliseconds for which a radar or smoke sensor will remain triggered after the actual event. The default behavior is 60000 ms (or one minute) for both, and their values can range from 500 ms all the way to 300000 (five minutes). If you don't set these options, the sensors will remain trigerred momentarily and then turn off again.
 
-* `displayBypassSwitches` - this setting is optional and allows you to override the plugin's standard behavior and hide the bypass switches for zones. If not set, this defaults to true (see Usage below).
+* `displayBypassSwitches` - this setting is optional and allows you to override the plugin's standard behavior and show the bypass switches for zones. If not set, this defaults to false (see Usage below).
+
+* `displayChimeSwitches` - this setting is optional and allows you to override the plugin's standard behavior and hide the chime switches for areas. If not set, this defaults to true (see Usage below).
 
 * `displayOutputSwitches` - this optional setting allows you to display switches for controlling the security system's output relays (defaults to false). Some users use the relays to control devices such as outdoor lights or garage doors, this setting exposes control of the output relays to HomeKit. Make sure to check the output settings in the NX-595E's web interface; by default, they turn back off again after a few seconds, you will have to modify that behavior to whatever you like. In any case, the plugin will reflect the current state of the relays.
 

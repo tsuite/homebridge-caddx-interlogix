@@ -13,12 +13,13 @@ import { AreaState } from "./definitions";
  */
 export class NX595EPlatformSecurityAreaAccessory {
   private alarmService: Service;
-  private chimeService: Service;
+  private chimeService: Service | undefined = undefined;
 
   constructor(
     private readonly platform: NX595EPlatform,
     private readonly accessory: PlatformAccessory,
     private readonly securitySystem: NX595ESecuritySystem,
+    protected readonly displayChimeSwitches: Boolean
   ) {
 
     // set accessory information
@@ -41,11 +42,20 @@ export class NX595EPlatformSecurityAreaAccessory {
       this.alarmService.getCharacteristic(this.platform.Characteristic.SecuritySystemTargetState)!
         .onSet(this.setTargetState.bind(this));
 
-      this.chimeService = this.accessory.getService(this.platform.Service.Switch) || this.accessory.addService(this.platform.Service.Switch);
-
-      this.chimeService.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.displayName + " Chime");
-      this.chimeService.getCharacteristic(this.platform.Characteristic.On)!
-        .onSet(this.setChimeState.bind(this));
+      this.chimeService = this.accessory.getService(this.platform.Service.Switch);
+      if (displayChimeSwitches) {
+          if (this.chimeService == undefined) {
+              this.chimeService = this.accessory.addService(this.platform.Service.Switch);
+          }
+        this.chimeService.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.displayName + " Chime");
+        this.chimeService.getCharacteristic(this.platform.Characteristic.On)!
+          .onSet(this.setChimeState.bind(this));
+      } else {
+        if (this.chimeService) {
+          this.accessory.removeService(this.chimeService);
+          this.chimeService = undefined;
+        }
+      }
 
         this.platform.log.debug('Alarm system created:', accessory.context.device.displayName);
   }
