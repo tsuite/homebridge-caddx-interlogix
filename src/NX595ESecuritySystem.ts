@@ -194,11 +194,11 @@ export class NX595ESecuritySystem {
       area_names.forEach((item, i, arr) => { arr[i] = decodeURI(item.replace(/['"]+/g, '')); })
 
       // Pad sequence table to match the length of area_names table
-      if (area_names.length - sequence.length > 0) {
-        let filler = new Array(area_names.length - sequence.length);
-        filler.fill(0);
-        sequence = sequence.concat(filler);
-      }
+      //if (area_names.length - sequence.length > 0) {
+      //  let filler = new Array(area_names.length - sequence.length);
+      //  filler.fill(0);
+      //  sequence = sequence.concat(filler);
+      //}
 
       // Reset class areas tables...
       this.areas.length = 0;
@@ -212,9 +212,10 @@ export class NX595ESecuritySystem {
         // Create a new Area object and populate it with the area details, then push it
         let newArea: Area = {
           bank: i,
+          areabank: Math.floor(i/8),
           name: (name == "" ? 'Area ' + (i+1): name),
           priority: 6,
-          sequence: sequence[i],
+          sequence: sequence[Math.floor(i/8)],
           bank_state: bank_states.slice(startingState, startingState + 17),
           status: "",
           states: {}
@@ -526,11 +527,17 @@ export class NX595ESecuritySystem {
       }
 
       // Now check for area update
-      for (index = 0; index < seqResponse.areas.length; index++) {
-        if (seqResponse.areas[index] != this.areas[index].sequence) {
+      for (let areabank: number = 0; areabank < seqResponse.areas.length; areabank++) {
+        let performAreaStatusUpdate: Boolean = false;
+        for (let bank: number = 0; bank < this.areas.length; bank++) {
+	if (seqResponse.areas[areabank] != this.areas[bank].sequence) {
           // Updating sequence and zone details now
-          this.areas[index].sequence = seqResponse.areas[index];
-          await this.areaStatusUpdate(index);
+          this.areas[bank].sequence = seqResponse.areas[areabank];
+          performAreaStatusUpdate = true;
+          }
+        }
+        if (performAreaStatusUpdate) {
+          await this.areaStatusUpdate(areabank);
           performAreaUpdate = true;
         }
       }
@@ -587,9 +594,13 @@ export class NX595ESecuritySystem {
       const json = parser.parse(response.data)['response'];
       if (json.hasOwnProperty('sysflt')) this.__extra_area_status = json['sysflt'].split('\n');
       else this.__extra_area_status = [];
-      this.areas[bank].bank_state.length = 0;
-      for (let index: number = 0; index < 17; index++) {
-        this.areas[bank].bank_state.push(json["stat"+index]);
+      for (let index: number = 0; index < this.areas.length; index++) {
+ 	if (this.areas[index].areabank == bank) {
+          this.areas[index].bank_state.length = 0;
+          for (let statbyte: number = 0; statbyte < 17; statbyte++) {
+            this.areas[index].bank_state.push(json["stat"+statbyte]);
+          }
+        }
       }
     } catch (error) { throw(error); }
 

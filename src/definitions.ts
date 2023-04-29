@@ -22,6 +22,7 @@ export enum SecuritySystemCLIScenes {
 }
 
 export interface Area {
+  areabank: number;
   bank: number;
   name: string;
   priority: number;
