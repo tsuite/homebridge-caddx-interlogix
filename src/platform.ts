@@ -270,14 +270,28 @@ export class NX595EPlatform implements DynamicPlatformPlugin {
       });
     });
 
+    // Get override zones table from configuration
+    // Overrides have a zone index specified; in case the user has declared
+    // multiple overrides for the same zone index, only the last one applies
+    const declaredAreaOverrides = (this.config.areaOverride) ? this.config.areaOverride : [];
+    let areaOverrides: any[] = new Array(this.securitySystem.getAreas().length).fill(undefined);
+    declaredAreaOverrides.forEach((element: any) => {
+      if (element.index < 1 || element.index > areaOverrides.length) {
+        throw new Error("Override declared for non-existent area with index " + element.index + "!");
+      }
+      areaOverrides[element.index-1] = element;
+    });
+
     this.securitySystem.getAreas().forEach(area => {
+      const areaShouldOverride = (areaOverrides[area.bank] != undefined) ? true : false;
+      const areaName = (areaShouldOverride && areaOverrides[area.bank].name && areaOverrides[area.bank].name !== "") ? areaOverrides[area.bank].name : area.name;
       this.log.debug('Detected area: ', area.name);
       devices.push({
         type: DeviceType.area,
         uniqueID: area.bank + '#' + area.name,
         bank: area.bank,
         bank_state: area.bank_state,
-        displayName: area.name,
+        displayName: areaName,
         firmwareVersion: this.securitySystem.getFirmwareVersion(),
       });
     });

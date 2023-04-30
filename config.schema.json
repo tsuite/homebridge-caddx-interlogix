@@ -136,6 +136,31 @@
         },
         "uniqueItems": false,
         "description": "Custom override for zone names and accessory types"
+      },
+      "areaOverride": {
+        "title": "Area Overrides",
+        "type": "array",
+        "required": false,
+        "minItems": 0,
+        "items": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "title": "Area index",
+              "type": "number",
+              "required": true,
+              "description": "The index of the specified area to override (must be valid; when multiple overrides are set for the same area index, only the last one will be used)"
+            },
+            "name": {
+              "title": "Area name",
+              "type": "string",
+              "required": false,
+              "description": "The override name for this area (or left blank if you want to retain the original name)"
+            }
+          }
+        },
+        "uniqueItems": false,
+        "description": "Custom override for area names"
       }
     }
   }
